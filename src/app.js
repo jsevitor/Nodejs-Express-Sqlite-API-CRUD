@@ -1,23 +1,24 @@
-import { openDb } from "./configDB.js";
 import express from "express";
-import { createTable, insertPessoa } from "./Controler/Pessoa.js";
+import router from "./routes.js";
+import cors from "cors";
+import https from "https";
+import fs from "fs";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-
-createTable();
-
-app.get("/", (req, res) => {
-  res.send("Ola mundor");
-});
-
-app.post("/pessoa", (req, res) => {
-  insertPessoa(req.body);
-  res.json({
-    statusCode: 200,
-  });
-});
+app.use(cors());
+app.use(router);
 
 app.listen(PORT, () => console.log("API rodando..."));
+
+https
+  .createServer(
+    {
+      cert: fs.readFileSync("src/SSL/code.crt"),
+      key: fs.readFileSync("src/SSL/code.key"),
+    },
+    app
+  )
+  .listen(3001, () => console.log("Rodando um https"));
